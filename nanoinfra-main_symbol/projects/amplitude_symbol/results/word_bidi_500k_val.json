@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "split": "val",
+    "checkpoint": "step_499999",
+    "n_samples": 26388,
+    "n_orbits": 4398,
+    "decoding": {
+      "method": "free_autoregressive_generation",
+      "temperature": 0.0,
+      "top_k": null,
+      "gen_token_type": 2,
+      "stop_token": "EOS",
+      "sequence_len": 32,
+      "gen_batch_size": 64
+    },
+    "elapsed_seconds": 7.53,
+    "predictions_file": "outputs/amplitude_symbol/big_eval/word_bidi/step_499999/predictions_val.json"
+  },
+  "sample_metrics": {
+    "n_samples": 26388,
+    "n_valid": 26388,
+    "n_invalid": 0,
+    "exact_accuracy": 0.990033,
+    "magnitude_accuracy": 0.990791,
+    "sign_accuracy": 0.99837,
+    "invalid_output_rate": 0.0
+  },
+  "orbit_metrics": {
+    "n_orbits": 4398,
+    "n_eligible_orbits": 4398,
+    "n_singleton_orbits": 0,
+    "orbit_consistency": 0.994998,
+    "whole_orbit_accuracy": 0.989313
+  }
+}

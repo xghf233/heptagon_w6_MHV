@@ -1,0 +1,27 @@
+{
+  "n_samples": 26388,
+  "500K": {
+    "n_errors": 263,
+    "counts": {
+      "correct": 26125,
+      "sign_and_magnitude": 23,
+      "sign": 20,
+      "magnitude": 220
+    }
+  },
+  "150K": {
+    "n_errors": 281,
+    "counts": {
+      "correct": 26107,
+      "sign_and_magnitude": 36,
+      "sign": 55,
+      "magnitude": 190
+    }
+  },
+  "overlap": {
+    "both": 227,
+    "a_only": 36,
+    "b_only": 54,
+    "jaccard": 0.7160883280757098
+  }
+}

@@ -1,0 +1,60 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+
+# --- Local secrets (review examples before committing) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+
+# --- Training and evaluation artifacts ---
+*.pt
+*.pth
+*.bin
+*.ckpt
+*.distcp
+*.safetensors
+*.log
+*.jsonl
+*.wxf
+*.npy
+*.npz
+checkpoints/
+wandb/
+tensorboard/
+nanoinfra-artifacts/
+.hydra/
+**/MANIFEST.json
+
+# Keep artifact boundary directories, ignore their generated contents.
+**/datasets/*
+!**/datasets/.gitkeep
+**/models/*
+!**/models/.gitkeep
+**/outputs/*
+!**/outputs/.gitkeep
+
+# --- OS ---
+.DS_Store
