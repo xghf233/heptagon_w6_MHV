@@ -1,0 +1,40 @@
+{
+  "run_name": "w6-random-seed42",
+  "source": "user-supplied server archives, 2026-09-07",
+  "split_protocol": "random_row_seed42",
+  "completed_steps": 73008,
+  "n_parameters": 13657600,
+  "rows_consumed": 37380096,
+  "elapsed_seconds": 837.9251308627427,
+  "peak_cuda_bytes": 941300224,
+  "gpu": "NVIDIA GeForce RTX 5090",
+  "cuda": "13.0",
+  "best_checkpoint": "step_073000",
+  "final_checkpoint": "step_073008",
+  "val": {
+    "n_samples": 46725,
+    "n_invalid": 0,
+    "n_exact": 46725,
+    "n_magnitude": 46725,
+    "n_sign": 46725,
+    "exact_accuracy": 1.0,
+    "magnitude_accuracy": 1.0,
+    "sign_accuracy": 1.0,
+    "invalid_rate": 0.0
+  },
+  "test": {
+    "n_samples": 46725,
+    "n_invalid": 0,
+    "n_exact": 46725,
+    "n_magnitude": 46725,
+    "n_sign": 46725,
+    "exact_accuracy": 1.0,
+    "magnitude_accuracy": 1.0,
+    "sign_accuracy": 1.0,
+    "invalid_rate": 0.0
+  },
+  "training_phase_test_evaluated": false,
+  "training_acceptance_field": "not_requested",
+  "independent_test_record_present": true,
+  "locally_rerun": false
+}

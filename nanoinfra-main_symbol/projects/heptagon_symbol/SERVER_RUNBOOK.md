@@ -1,13 +1,15 @@
 # Heptagon w6 服务器运行手册
 
-状态：2026-09-07 完成本地代码准备和静态审阅，尚无单测、推理、smoke 或训练运行结果。
+状态：2026-09-07 已接回73,008步正式训练、独立 val/test 评估和服务器代码修复。
+本页保留后续复验流程，原始记录及证据边界见
+[导入核对](reports/SERVER_IMPORT_2026-09-07.md)。本次未在 Mac 重跑模型或单测。
 每阶段运行前按仓库 AGENTS.md 核对命令、输入输出和预算，取得用户确认。
 文档里的路径是模板，不能原样执行，也不代表获准启动远端计算。
 
 ## 1. 环境与数据交接
 
 在服务器干净工作树上通过 Git 获取已审阅代码；若服务器有未提交或分歧修改，先停下协调。
-本仓库只发布 `nanoinfra-main_symbol`；不要混入其他 checkout 的 PYTHONPATH。
+本仓库只包含 `nanoinfra-main_symbol`；不要混入其他 checkout 的 PYTHONPATH。
 原始 WXF 不必上传；单独传输已经生成的五个 `w6/v1` 文件，约 5.62 MB，保留原样。
 代码同步不包含数据、venv 或日志；不要使用 `rsync --delete`。
 
@@ -16,6 +18,11 @@
 ```text
 /ABSOLUTE/SERVER/PATH/heptagon_w6_MHV/nanoinfra-main_symbol
 ```
+
+历史 run.json 记录的数据目录为 `/root/autodl-tmp/datasets/heptagon_symbol/w6/v1_upload`，
+输出目录为 `/root/autodl-tmp/runs/heptagon/w6-random-seed42`，PyTorch 2.12.1+cu130、
+NumPy 2.4.6。这些是已下载文件中的运行记录，不代表当前服务器连接检查。
+原运行目录应保留，新运行必须使用新输出目录。
 
 运行前检查现成环境中的 Python >=3.12、PyTorch、NumPy、Hydra/OmegaConf、pytest。
 不自动安装或升级依赖。CUDA 步骤须有 bf16 支持；使用 plain `python`，不使用 torchrun。
@@ -104,8 +111,8 @@ CUDA_VISIBLE_DEVICES=0 python -m projects.heptagon_symbol.train --config-name w6
 ```
 
 预算：373,800 train，batch=512，73,008 次更新，共37,380,096个样本呈现，约100.00026轮。
-每步真实输入7936 tokens、有监督1536 tokens；8192只是名义配置预算。
-预计参数量13,657,600，实际数写进 run.json；单卡 bf16 + compile。
+每步真实输入7680 tokens（512×15）、有监督1536 tokens；8192只是名义配置预算。
+本次 run.json 记录参数量13,657,600；单卡 bf16 + compile。
 正式运行前根据 smoke 实測耗时、显存、磁盘和全量验证成本估算资源，不凭空给小时报价。
 
 每3650步：固定4096项 val 子集；每18250步和结束时：全量46,725项 val。
@@ -134,9 +141,11 @@ CUDA_VISIBLE_DEVICES=0 python -m projects.heptagon_symbol.eval_checkpoint \
 使用新的输出文件；可加 `--save-predictions` 保存原始行号和逐项预测。
 训练脚本不会自动触发 test；独立评估默认也是 val。
 
-## 8. 尚未验证的风险
+## 8. 已有证据与后续验证边界
 
-本次只交付代码与验证计划。服务器尚需验证 DCP/优化器恢复、bf16/compile、
-GPU 缓存生成与未缓存路径、实际显存、全量验证耗时和 tiny-overfit 收敛。
+下载包包含正式训练日志、两个 DCP checkpoint 和独立 val/test JSON。
+服务器报告称 smoke、恢复对照、tiny-overfit 与 compile smoke 已通过，
+但对应完整原始输出及 CPU pytest 结果未随包提供，本次文件核对不替代复跑验收。
+后续代码变更仍需按影响范围验证恢复、缓存生成、环境兼容性及训练行为。
 当前设计限定单卡，不包含 DDP、轨道泛化、零样本学习或跨圈泛化。
 共享 `core` 和旧 amplitude 项目没有被修改；如发现需要修改框架，先说明原因。

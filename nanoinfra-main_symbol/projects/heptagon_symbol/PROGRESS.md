@@ -2,20 +2,21 @@
 
 最后更新：2026-09-07。
 
-当前状态：**本地数据转换已执行并通过数据完整性审计；训练工程代码和测试已编写，尚未执行服务器验证或训练。**
-“代码已编写”不等于“测试通过”，也不代表已获得模型精度、耗时或显存结果。
+当前状态：**已从用户下载的服务器压缩包接回配置修复、正式训练结果和 best/最终 checkpoint。**
+随包记录显示 73,008 次更新，全量 val/test 各 46,725 项 exact=1.0，采用 random-row split。
+本次核对文件、哈希和 JSON 记录，未在 Mac 重跑单测、模型加载、推理或训练。
+详细来源、导入清单与证据边界见
+[SERVER_IMPORT_2026-09-07.md](reports/SERVER_IMPORT_2026-09-07.md)。
 
 ## 1. 工程位置与复用边界
 
-开发阶段是在现有 `HZQ-git/nanoinfra-main_symbol` 内新增 `projects/heptagon_symbol/`，
-没有从头实现 Transformer。发布阶段将完整 Symbol edition 复制到独立的
-`heptagon_w6_MHV` Git 仓库，保留 `nanoinfra-main_symbol/` 层级。
-它仍与旧 `projects/amplitude_symbol/` 并列，共享同一版 `core/`。
-以下实现与数据记录保留开发历史；新发布副本不自动回写原始 `HZQ-git`。
+本项目最初在 `HZQ-git/nanoinfra-main_symbol` 中开发，随后将完整 Symbol edition
+发布到 `heptagon_w6_MHV`。现在本仓库作为主开发入口，本地编辑，经 GitHub 同步到
+服务器运行副本。保留 `nanoinfra-main_symbol/` 层级及旧 amplitude 依赖，不重建框架。
 
-发布准备（2026-09-07）：已配置新仓库 remote，补充根 README、协作约定、
-服务器路径占位说明和忽略规则。本次仅整理文档及忽略规则，未修改模型源码或配置；
-尚未暂存、提交或推送，服务器 checkout 和环境路径待部署时确认。
+服务器包基于本仓库的 `9bae12d` 加未提交的 `train.py` 修复。第一阶段已将它接回
+HZQ-git 并核对产物；本阶段将核对后的代码、报告和状态说明合入本仓库。
+本阶段没有修改 HZQ-git、standard 版或仓库外的模型数据，也没有暂存、提交或推送。
 
 | 部分 | 本次处理 |
 | --- | --- |
@@ -54,23 +55,25 @@
 输入/输出哈希和详细审计分别在产物 `metadata.json` 与 `audit.json`。
 该审计证明转换数据完整，不替代后来新增 tokenizer、训练或 checkpoint 的运行验证。
 
-## 3. 已编写、待验证的工程
+## 3. 工程与导入后的验证状态
 
 | 模块 | 内容 | 执行验证状态 |
 | --- | --- | --- |
-| `dataset.py` | 数组/哈希检查、固定 split、CPU 预编码、逐轮洗牌、恢复采样位置 | 待服务器测试 |
-| `tokenizer.py` | 1048词表、base-1000、长度16序列、sign/magnitude/EOS监督、严格解码 | 待服务器测试 |
-| `model.py` | 复用GPT，编译前安装 `[1,7)` mask，检查运行时配置 | 待服务器测试 |
-| `train.py` | 单卡bf16训练、日志、显式步数预算、验证和保存 | 待服务器 smoke |
-| `evaluator.py` | 长度8无标签prompt、贪心自由生成、exact/sign/magnitude/invalid及分组指标 | 待服务器测试 |
-| `checkpoint.py` | 模型/优化器、数据进度、RNG、训练配置和数据/代码哈希 | 待恢复对照 |
-| `eval_checkpoint.py` | 独立恢复评估；默认val，test需显式启用 | 待服务器测试 |
-| `tests/` | 编码、无泄漏负对照、缓存生成、配置、参数计数、恢复后下一步更新等 | 已编写，未运行 |
+| `dataset.py` | 数组/哈希检查、固定 split、CPU 预编码、逐轮洗牌、恢复采样位置 | 随包正式运行使用；源码哈希一致 |
+| `tokenizer.py` | 1048词表、base-1000、长度16序列、sign/magnitude/EOS监督、严格解码 | 随包正式运行使用；源码哈希一致 |
+| `model.py` | 复用GPT，编译前安装 `[1,7)` mask，检查运行时配置 | 随包正式运行使用；源码哈希一致 |
+| `train.py` | 单卡bf16训练、日志、显式步数预算、验证和保存 | 合入 Hydra 顶层键豁免；73,008步记录已接回 |
+| `evaluator.py` | 长度8无标签prompt、贪心自由生成、exact/sign/magnitude/invalid及分组指标 | 全量 val/test 评估 JSON 已接回 |
+| `checkpoint.py` | 模型/优化器、数据进度、RNG、训练配置和数据/代码哈希 | 两份 DCP 已保存并核对元数据；未本地加载 |
+| `eval_checkpoint.py` | 独立恢复评估；默认val，test需显式启用 | 独立 val/test JSON 已接回；未本地复评 |
+| `tests/` | 编码、无泄漏负对照、缓存生成、配置、参数计数、恢复后下一步更新等 | 本次包没有完整 pytest 输出；未重跑 |
 
-本地只进行了源码静态审阅与差异空白检查，没有执行 Python 单测、模型推理、smoke 或训练。
-也未在服务器安装依赖、运行计算、提交或推送这些改动。
+服务器报告称 smoke、恢复对照、tiny-overfit 与 compile smoke 已通过；
+相关阶段的完整原始产物没有随包提供。正式训练记录与独立评估结果可直接核对，
+但不能仅凭报告将所有单测或“无泄漏”结论标记为独立验证通过。
+本次只修改本地文件，没有连接服务器、安装依赖、运行模型、提交或推送。
 
-## 4. 已准备的运行配置（不是训练结果）
+## 4. 运行配置与首轮记录
 
 | 配置 | 模型 | batch | 预算 | 用途 |
 | --- | --- | ---: | ---: | --- |
@@ -78,18 +81,23 @@
 | `tiny_overfit` | 同上 | 32 | 1000步、固定32项train | 要求全32项自由生成exact=1，否则报失败 |
 | `w6_random` | 同上 | 512 | 73,008步，约100次train遍历 | 首轮正式实验 |
 
-正式模型参数量预计13,657,600，已编写计数测试，实际组装后再核对。
+正式 run.json 记录模型参数量13,657,600，837.925秒，峰值显存941,300,224 bytes。
 周期验证固定4096项val；全量val为46,725项，只有全量val exact改善才更新best。
 训练不自动评估test，不将随机切分结果与旧D3隔离实验当成同难度比较。
 
-## 5. 下一步与验收顺序
+best 为 `step_073000`，最终为 `step_073008`，两者全量 val exact=1.0。
+独立 best-val 与 best-test 各记录46,725/46,725项正确；test JSON 含逐项预测。
+summary 中 `test_evaluated=false` 仅表示训练阶段没有评估 test，后续独立结果
+以 `best-test.json` 为准；`acceptance=not_requested` 不是全套验收状态。
+本地仓库外产物位置及保留文件见导入审计；中间19个 checkpoint 未包含在下载包中。
 
-1. 用户审阅代码，协调本地/服务器Git版本与只读数据传输。
-2. 服务器CPU单测，再进行真实转换产物加载验证（不能以skip算通过）。
-3. GPU eager smoke与连续20步/分段10+10步恢复对照。
-4. Tiny-overfit与独立compile smoke。
-5. 实测耗时、显存、磁盘与全量验证成本后，单独批准正式训练。
-6. 根据全量val选择checkpoint；协议锁定后另行批准test评估。
+## 5. 后续工作
+
+1. 审阅本仓库的合入差异，获准后暂存、提交，再单独确认推送 GitHub；日常开发集中在本仓库。
+2. 如需完成逐阶段证据归档，从服务器补回 CPU pytest、smoke、恢复对照等原始记录。
+3. 后续复评或恢复前核对 CUDA 环境、数据与代码哈希；不能修改旧 checkpoint 的哈希来绕过校验。
+4. 新实验使用新输出目录；多 seed、orbit-grouped 或跨 weight 实验需另行确定协议。
+5. test 已有一次独立评估记录，后续复评应明确标注为复评，不能再次称为首评。
 
 每阶段命令、读写范围和验收条件见 [SERVER_RUNBOOK.md](SERVER_RUNBOOK.md)。
 接口见 [README.md](README.md)，完整设计和实施历史见

@@ -29,8 +29,10 @@ def validate_config(config: dict) -> None:
                "model", "seed", "compile", "head_softcap", "device_batch_size", "total_batch_size",
                "max_steps", "optimizer", "evaluation", "checkpoint", "logging",
                "overfit_n_samples", "require_overfit_exact"}
-    if set(config) != allowed:
-        raise ValueError(f"Missing/unsupported configuration keys: {set(config) ^ allowed}")
+    # Hydra injects a top-level `hydra` node into every composed config; it is
+    # framework bookkeeping, not recipe, and must not fail the strict check.
+    if (set(config) ^ allowed) - {"hydra"}:
+        raise ValueError(f"Missing/unsupported configuration keys: {(set(config) ^ allowed) - {'hydra'}}")
     model_config(config)
     for key in ("device_batch_size", "max_steps"):
         if type(config[key]) is not int or config[key] <= 0:

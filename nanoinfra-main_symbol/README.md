@@ -2,7 +2,7 @@
 
 Specialized NanoInfra workspace for scattering-amplitude symbol coefficient
 prediction. This edition contains two scientific projects sharing one framework
-core. This repository publishes only the Symbol edition; the historical standard
+core. This is the active research repository for the Symbol edition; the historical standard
 edition is not included.
 
 The existing five-loop `amplitude_symbol` project uses ten-letter words and D3
@@ -17,7 +17,7 @@ Their split protocols and accuracy results must not be treated as equivalent.
 | --- | --- |
 | [`core/`](core/) | GPT trunk, training loop, checkpointing, inference, and evaluation mechanisms |
 | [`projects/amplitude_symbol/`](projects/amplitude_symbol/) | Symbol data pipeline, tokenizer, experiments, tests, reports, and curated results |
-| [`projects/heptagon_symbol/`](projects/heptagon_symbol/) | Three-loop MHV conversion, random-row data pipeline, training/evaluation code, and server verification plan |
+| [`projects/heptagon_symbol/`](projects/heptagon_symbol/) | Three-loop MHV conversion, random-row data pipeline, training/evaluation code, and imported server results |
 
 Generated data, checkpoints, and run outputs are kept outside this repository;
 artifact directories are not required to exist in the publication copy.
@@ -26,9 +26,13 @@ For current heptagon work, start with its [project README](projects/heptagon_sym
 [progress record](projects/heptagon_symbol/PROGRESS.md)
 and [server runbook](projects/heptagon_symbol/SERVER_RUNBOOK.md).
 
-As of 2026-09-07, heptagon conversion and data-integrity auditing are complete;
-its model-related code and tests are written but not yet executed. No heptagon
-training accuracy, runtime, or GPU-memory result is available.
+As of 2026-09-07, the server's Hydra configuration fix and first-run reports have
+been imported into this repository. Supplied records show 73,008 updates,
+13,657,600 parameters, and full val/test exact accuracy of 1.0 (46,725 rows each,
+random-row split). All 20 source hashes in both retained checkpoint contracts
+match this edition. Models and complete outputs remain outside Git.
+See the [import audit](projects/heptagon_symbol/reports/SERVER_IMPORT_2026-09-07.md)
+for provenance and limits; no model or unit tests were rerun locally.
 
 ## Environment
 

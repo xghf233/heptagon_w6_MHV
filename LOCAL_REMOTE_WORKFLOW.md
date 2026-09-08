@@ -1,91 +1,85 @@
-# heptagon_w6_MHV 本地编辑与服务器执行
+# heptagon_w6_MHV 本地开发与服务器运行
 
-## 仓库边界
+## 仓库与职责
 
-- 本地发布仓库：`/Users/hzq/hep_th/Building Intelligent Models from Scratch/heptagon_w6_MHV`。
-- Git remote：`https://github.com/xghf233/heptagon_w6_MHV.git`。
-- 原始 `HZQ-git` 是独立的历史开发目录，不自动同步、覆盖或修改它的 remote。
-- 本仓库只含 Symbol edition；运行目录为 checkout 下的 `nanoinfra-main_symbol/`。
-- 服务器 checkout 和 Python 环境路径尚未确认，不能沿用旧项目路径作为已部署事实。
+当前科研项目使用一条主线：**本地 heptagon_w6_MHV → GitHub 同名仓库 → 服务器运行副本**。
 
-本地编辑代码与文档；所有模型测试、推理、smoke 和训练在服务器经批准执行。
-保留整个 Symbol edition，包括 `core` 与 heptagon 依赖的旧 amplitude 通用工具。
+- 本地开发目录：`/Users/hzq/hep_th/Building Intelligent Models from Scratch/heptagon_w6_MHV`。
+- GitHub remote：`https://github.com/xghf233/heptagon_w6_MHV.git`。
+- 本仓库只含 `nanoinfra-main_symbol/`，保留 core 及 heptagon 依赖的 amplitude 工具。
+- `HZQ-git` 是独立历史工作区，不自动同步或修改它；standard 版不属于本仓库。
+- 数据、环境、checkpoint 和完整输出放在仓库外；本地备份使用同级 `nanoinfra-artifacts/`。
+- 服务器当前 checkout 和 Python 环境路径需要连接后核对，不能把旧项目路径当作当前部署事实。
 
-## 首次提交：先审阅，再推送
+本地直接准备源码与文档；所有项目单测、模型推理、smoke 和训练仍按 AGENTS.md 在服务器执行。
+Docker 任务副本不再是每次编辑的必经步骤。需要更强隔离的任务可单独采用容器。
 
-以下命令由用户确认后执行；整理文档不等于授权 AI 提交或推送。
-截至 2026-09-07 发布准备阶段为 `main` 分支、尚无提交。空远端对应的
-`origin/main [gone]` 在首次推送前不代表代码丢失。
+## 本次基线与结果
+
+2026-09-07 只读核查时，本地及 GitHub main 均为 `9bae12d`，首次发布已经完成。
+服务器配置校验修复和首轮报告先接回 HZQ-git，随后整理进本仓库工作区。
+这次本地整理不包含暂存、提交或推送；版本是否已发布应以实际 Git 状态为准。
+
+首轮训练与模型位置见 [PROGRESS.md](nanoinfra-main_symbol/projects/heptagon_symbol/PROGRESS.md)，
+证据边界见 [导入核对](nanoinfra-main_symbol/projects/heptagon_symbol/reports/SERVER_IMPORT_2026-09-07.md)。
+原手册的“首次提交待完成”“尚无运行结果”等待办不再适用。
+
+## 本地修改与发布
+
+只读检查可以直接进行：
 
 ```bash
-cd "/Users/hzq/hep_th/Building Intelligent Models from Scratch/heptagon_w6_MHV"
 git status --short --branch
-git remote -v
-git add README.md LICENSE .gitignore AGENTS.md CLAUDE.md LOCAL_REMOTE_WORKFLOW.md nanoinfra-main_symbol
-git diff --cached --stat
-git diff --cached --check
+git diff --stat
+git diff
 git diff --cached
 ```
 
-`git add` 只暂存到本地，不上传。首次提交前 `git diff` 不显示未跟踪文件内容，
-因此必须检查暂存区；确认没有密钥、数据、环境、checkpoint、日志或无关内容。
-不要用 `git add -f` 绕过忽略规则；有异常先停下核查。
+按用户当前要求，修改文件、切换分支、暂存、提交或推送之前，先说明具体范围并取得批准。
+一个阶段的批准不自动覆盖下一阶段。较大任务可在获准后建立任务分支或 worktree，
+但 worktree 只隔离工作目录和改动，不替代权限沙盒。
 
-审阅通过后：
+完成修改后，核对所有新增文件，不能只看 git diff（默认不显示未跟踪文件内容）。
+只暂存审阅过的代码、配置、文档、紧凑指标和选定图表；不使用 git add -f 绕过忽略规则。
+随后检查暂存差异，获准后提交。推送前重新核对远端分支与待推送提交，单独获得确认。
+不强推，不把 HZQ-git 的无关历史或整个工作区混入本仓库。
 
-```bash
-git commit -m "Add heptagon w6 MHV training pipeline"
-git push -u origin main
-git status --short --branch
-```
+## 服务器获取已发布版本
 
-不使用 force-push。如果身份配置、认证或远端历史报错，先检查具体错误；
-不要粘贴访问令牌到聊天或把凭证写入仓库。
+第一次在选定的新目录 clone；已有 checkout 先核对 remote、分支、HEAD、未提交修改，
+以及目标运行目录是否正在被训练使用。确认可以更新后获取用户指定的分支或提交。
+服务器源码有未提交修改、分歧提交或来源不明文件时，先协调，不重置或覆盖。
 
-## 后续本地修改
-
-先检查 `git status`，保留无关用户改动。按需在干净工作树创建任务分支，
-只暂存已审阅文件，检查 `git diff` 和 `git diff --cached` 后提交。
-AI 推送、重写历史、删除分支等操作仍需明确确认。
-不要在 Mac 自动创建环境、安装依赖或运行模型测试。
-
-## 服务器获取代码
-
-首次部署：在用户选定的服务器父目录执行以下命令，不覆盖已有目录。
-这是私有仓库，需使用服务器上已配置的授权方式；不要在命令 URL 中嵌入令牌。
-
-```bash
-git clone https://github.com/xghf233/heptagon_w6_MHV.git
-cd heptagon_w6_MHV
-git status --short --branch
-git remote -v
-git rev-parse HEAD
-```
-
-已有 checkout 更新前，确认 remote 正确、工作树干净，且没有未经协调的本地提交。
-仅在确认应更新 `main` 时执行：
+以下是更新已有 main 的示例，需先满足上述条件并获准：
 
 ```bash
 git fetch origin
 git switch main
 git pull --ff-only origin main
+git rev-parse HEAD
 ```
 
-若存在未提交修改、分歧历史或快进失败，停下协调，不重置、不强推、不覆盖。
-代码通过 Git 同步；不要使用 `rsync --delete`，也不要把整个服务器工作区同步回来。
+将最终 HEAD 与选定的已发布提交核对；不要仅记录“最新 main”。
+正式训练使用固定代码版本，运行过程中不更新它正在使用的 checkout。
+运行入口从 `nanoinfra-main_symbol/` 执行，不能只复制 `projects/heptagon_symbol/`。
 
-## 数据、环境与验收
+## 环境、数据与实验
 
-1. 单独交接仓库外的五个转换文件：`words.npy`、`coefficients.npy`、`splits.npz`、
-   `metadata.json`、`audit.json`。不必上传 WXF；数据与输出不放入 Git。
-2. 确认实际服务器 Python 环境、数据路径和全新的输出路径，不默认创建或升级环境。
-3. 从 checkout 内 `nanoinfra-main_symbol/` 运行模块命令，不能只复制项目子目录。
-4. 按 [SERVER_RUNBOOK.md](nanoinfra-main_symbol/projects/heptagon_symbol/SERVER_RUNBOOK.md)
-   依次执行 CPU 测试、真实数据检查、GPU smoke、恢复对照、tiny-overfit、compile 检查。
-5. 每阶段先说明命令、读写位置、预计资源与验收标准，取得用户确认；正式训练另行批准。
+优先复用服务器现有环境与仓库外数据，不在更新代码时复制 venv 或自动升级依赖。
+历史 run.json 记录的是 PyTorch 2.12.1+cu130、NumPy 2.4.6、RTX 5090，
+不代表当前服务器环境已经重新检查。新实验采用尚不存在的输出目录。
 
-记录实际 commit、命令、环境/GPU、退出状态、指标、日志与 checkpoint 路径。
-目前没有服务器运行结果，不把“代码已准备”记为“测试通过”。
+根据 [SERVER_RUNBOOK.md](nanoinfra-main_symbol/projects/heptagon_symbol/SERVER_RUNBOOK.md)
+选择与修改相关的最小验证；说明命令、输入输出、资源和验收条件，获准后执行。
+每次实验记录代码 commit、配置、数据版本、环境、命令、结果与 checkpoint 路径。
+服务器报告与本地核验结论分开记录；缺失的单测输出不能当作通过。
 
-数据、环境、checkpoint 和日志留在 Git 外；只带回经审阅的小型报告或图。
-若服务器直接改了源码，先协调并审阅提交，再通过 Git 带回，避免两地独立修改同一文件。
+## 接回修复与结果
+
+服务器若修改源码，先审阅差异，获准后提交到修复分支并经 GitHub 接回本地。
+避免两端同时独立修改同一文件。用户提供的离线补丁包可在明确授权后核对合入，
+保留来源、基线、补丁和哈希；不将压缩包直接覆盖整个仓库。
+
+报告、曲线和紧凑指标审阅后放入项目 reports；完整日志、逐项预测和模型按运行名称
+保存到 artifacts。模型备份保留完整 checkpoint 目录，不能只复制张量文件。
+不使用 rsync --delete，不把整个服务器工作区同步回来覆盖本地。

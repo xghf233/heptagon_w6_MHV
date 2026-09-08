@@ -1,14 +1,22 @@
-# Heptagon 三圈 MHV 数据准备
+# Heptagon 三圈 MHV 数据、训练与结果
 
 本项目已完成 weight-6 原始 WXF 的无损转换与逐样本随机切分。
-数据加载、tokenizer、单卡训练入口、attention mask、自由生成评估及 checkpoint
-代码和测试已编写，全部待服务器执行验证。完整设计见
+2026-09-07 已接回服务器的配置校验修复与正式训练记录：73,008 次更新，
+全量 val/test 各 46,725 项的 exact 均为 1.0（random-row split）。
+best 与最终 checkpoint 存放在仓库外，20 个记录的源码哈希均与更新后的本版一致。
+此次只核对文件和运行记录，未在 Mac 重跑模型或单测。完整设计见
 [HEPTAGON_W6_PLAN.md](../amplitude_symbol/docs/HEPTAGON_W6_PLAN.md)。
 
 最新状态与工程复用边界见 [PROGRESS.md](PROGRESS.md)；服务器执行顺序见
-[SERVER_RUNBOOK.md](SERVER_RUNBOOK.md)。本项目最初在 `HZQ-git` 的 Symbol edition
-内开发，目前随完整 Symbol edition 发布到独立的 `heptagon_w6_MHV` 仓库；
-仍复用其 `core` 和旧项目的通用 attention 工具，不替换旧 `amplitude_symbol` 实验。
+[SERVER_RUNBOOK.md](SERVER_RUNBOOK.md)。本项目最初在 HZQ-git 中开发，
+现在以 `heptagon_w6_MHV` 为主开发仓库，复用其 `core` 和旧 amplitude 的 attention 工具。
+
+服务器原始报告见 [reports/ACCEPTANCE_REPORT.md](reports/ACCEPTANCE_REPORT.md)；
+本次同步范围、证据核对和模型位置见
+[reports/SERVER_IMPORT_2026-09-07.md](reports/SERVER_IMPORT_2026-09-07.md)。
+报告生成脚本已收录为 `make_report.py`，从本版根目录运行
+`python -m projects.heptagon_symbol.make_report RUN_DIR NEW_REPORT_DIR`。
+它读取已有 JSON/JSONL 并需要 matplotlib；此次未安装依赖或重新绘图。
 
 从 `nanoinfra-main_symbol/` 运行，转换仅依赖 NumPy 与 Python 标准库：
 
@@ -125,7 +133,7 @@ epoch 顺序由 `PCG64(SeedSequence([seed, epoch]))` 重建，无须重放之前
 编码 metadata。新 `model.py` 在模型组装后、编译前显式安装该 mask；
 `evaluator.py` 与 `eval_checkpoint.py` 使用相同的协议进行生成和恢复。
 
-## 服务器验证（命令已准备，尚未执行）
+## 服务器验证（保留复验命令）
 
 按仓库约定，测试须在服务器经确认后运行。选定 `nanoinfra-main_symbol/` 为工作目录，
 使用服务器现有环境（Python >=3.12、NumPy、PyTorch、pytest）。不要把两个 edition
@@ -153,9 +161,11 @@ CUDA_VISIBLE_DEVICES='' HEPTAGON_W6_DATA_DIR=/absolute/server/path/heptagon_symb
 
 该测试校验真实 467,250 项、train 数量与系数覆盖，并预编码训练集、读取小 batch。
 未设置 `HEPTAGON_W6_DATA_DIR` 时该测试会 skip，不能把 skip 当成真实数据验证通过。
-以上测试代码仅完成本地静态检查；尚无服务器运行结果。
+本次产物包含正式训练及独立评估结果，但没有 CPU pytest 的逐项输出；
+因此不能据此把整个单测套件标记为通过。服务器报告的 smoke、恢复对照等结论
+与本次可核对的原始文件范围，见同步审计。
 
-## 训练与评估工程（2026-09-07，待远端验证）
+## 训练与评估工程（2026-09-07，已接回首轮运行产物）
 
 新增 `train.py`、`model.py`、`evaluator.py`、`checkpoint.py`、`eval_checkpoint.py`
 及 `configs/{smoke,tiny_overfit,w6_random}.yaml`。
@@ -185,4 +195,4 @@ CUDA_VISIBLE_DEVICES='' HEPTAGON_W6_DATA_DIR=/absolute/server/path/heptagon_symb
 新增测试覆盖 `[1,7)` 无泄漏（含旧 `[1,11)` 的负对照）、缓存/完整前向生成一致性、
 生成器 EOS 补齐、输入无真实标签、评估前后模式恢复、配置组装、参数量、
 checkpoint 模型/优化器/采样器/RNG 恢复及下一步更新一致性。
-这些测试是准备好的验证代码，不是已经得到的通过结果。
+单测文件予以保留；本次没有重跑，随包也没有完整 pytest 结果，测试状态单独记录。

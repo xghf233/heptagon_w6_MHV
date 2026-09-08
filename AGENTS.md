@@ -2,11 +2,11 @@
 
 ## Scope
 
-This repository is `heptagon_w6_MHV`, a publication copy of the Symbol edition
-originally developed in `HZQ-git`. It contains `nanoinfra-main_symbol/` only.
-The original `HZQ-git` is separate; do not modify or synchronize it implicitly.
-AI agents may
-inspect and edit source code, tests, configuration, and documentation here. The
+This repository is `heptagon_w6_MHV`, the primary development repository for the
+current heptagon research project. It contains `nanoinfra-main_symbol/` only,
+originally developed in `HZQ-git`. The original `HZQ-git` is a separate historical
+workspace; do not modify or synchronize it implicitly. AI agents may inspect
+and edit source code, tests, configuration, and documentation here. The
 AutoDL copy is the execution environment for every smoke test, unit test, training
 run, and GPU check.
 
@@ -14,6 +14,9 @@ run, and GPU check.
 
 - Treat this Git repository as the source of truth for code.
 - Before editing, inspect `git status` and preserve unrelated user changes.
+- Read-only inspection is authorized. Obtain the user's approval for the concrete
+  scope before modifying files, staging, committing, switching branches, or pushing.
+  Approval for one phase does not automatically authorize the next phase.
 - Make code and documentation changes locally; review `git diff` after editing.
 - Do not run Python tests, smoke tests, training, benchmarks, or model inference on
   the Mac unless the user explicitly changes this rule for a specific command.
